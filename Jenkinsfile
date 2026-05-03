@@ -8,7 +8,7 @@ pipeline {
         DOCKER_REPO  = 'docker-local'
         
         JFROG_HOST = 'trialsh57yr.jfrog.io'
-        JFROG_URL = 'https://${JFROG_HOST}'
+        JFROG_URL = "https://${JFROG_HOST}"
         JFROG_DOCKER_REPO = 'docker-local'
         JFROG_IMAGE_NAME = "${JFROG_HOST}/${JFROG_DOCKER_REPO}/${APP_NAME}"
     }
@@ -50,7 +50,7 @@ pipeline {
                     passwordVariable: 'JFROG_TOKEN'
                 )]) {
                     bat '''
-                    jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false
+                    jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false --overwrite=true
                     '''
                 }
             }
