@@ -60,7 +60,7 @@ pipeline {
             steps {
                 echo 'Deploying JAR to Artifactory...'
                 // Using 'deploy' instead of 'package' automates the JFrog upload
-                bat 'jf mvnw.cmd deploy -DskipTests --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server'
+                bat 'jf mvn deploy -DskipTests --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server'
             }
         }
 
