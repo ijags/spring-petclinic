@@ -52,7 +52,7 @@ pipeline {
                     bat '''
                     jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false --overwrite=true
                     
-                    jf mvn-config --server-id-deploy=jfrog-server --repo-deploy-releases=sample-maven-release --repo-deploy-snapshots=sample-maven-snapshot
+                    jf mvn-config --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server --repo-deploy-releases=sample-maven-release --repo-deploy-snapshots=sample-maven-snapshot
                     '''
                 }
             }
@@ -62,7 +62,7 @@ pipeline {
             steps {
                 echo 'Deploying JAR to Artifactory...'
                 // Using 'deploy' instead of 'package' automates the JFrog upload
-                bat 'jf mvn deploy -DskipTests --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server'
+                bat 'jf mvn deploy -DskipTests'
             }
         }
 
