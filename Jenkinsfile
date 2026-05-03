@@ -5,6 +5,12 @@ pipeline {
         APP_NAME = 'spring-petclinic'
         IMAGE_TAG = "4.0.0-SNAPSHOT-${BUILD_NUMBER}"
         IMAGE_NAME = "jagsonline/spring-petclinic"
+        DOCKER_REPO  = 'docker-local'
+        
+        JFROG_HOST = 'trialsh57yr.jfrog.io'
+        JFROG_URL = 'https://${JFROG_HOST}'
+        JFROG_DOCKER_REPO = 'docker-local'
+        JFROG_IMAGE_NAME = "${JFROG_HOST}/${JFROG_DOCKER_REPO}/${APP_NAME}"
     }
 
     stages {
@@ -36,9 +42,25 @@ pipeline {
             }
         }
 
-        stage('Archive Jar'){
+        stage('Configure JFrog CLI') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar' , fingerprint: true
+                withCredentials([usernamePassword(
+                    credentialsId: 'jfrog-creds',
+                    usernameVariable: 'JFROG_USER',
+                    passwordVariable: 'JFROG_TOKEN'
+                )]) {
+                    bat '''
+                    jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false
+                    '''
+                }
+            }
+        }
+
+        stage('Publish JAR to JFrog') {
+            steps {
+                echo 'Deploying JAR to Artifactory...'
+                // Using 'deploy' instead of 'package' automates the JFrog upload
+                bat 'jf mvnw.cmd deploy -DskipTests --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server'
             }
         }
 
@@ -46,36 +68,34 @@ pipeline {
             steps {
                 echo 'Building docker image...'
                 bat '''
-                docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
-                docker tag %IMAGE_NAME%:%IMAGE_TAG% %IMAGE_NAME%:latest
+                docker build -t %JFROG_IMAGE_NAME%:%IMAGE_TAG% .
+                docker tag %JFROG_IMAGE_NAME%:%IMAGE_TAG% %JFROG_IMAGE_NAME%:latest
                 '''
             }
         }
 
-        stage ('Docker Login'){
+        stage('JFrog Docker Login') {
             steps {
-                echo 'Docker login...'
+                echo 'JFrog Docker login...'
                 withCredentials([usernamePassword(
-                    credentialsId: 'docker-creds2',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_TOKEN'
+                    credentialsId: 'jfrog-creds',
+                    usernameVariable: 'JFROG_USER',
+                    passwordVariable: 'JFROG_TOKEN'
                 )]) {
                     powershell '''
-                    Write-Host "Docker user is $env:DOCKER_USER"
-                    docker login -u $env:DOCKER_USER -p $env:DOCKER_TOKEN
+                    $env:JFROG_TOKEN | docker login $env:JFROG_HOST -u $env:JFROG_USER --password-stdin
                     '''
                 }
             }
         }
 
-        stage ('Push Docker Image') {
+        stage('Push Docker Image to JFrog') {
             steps {
-                echo 'Push docker image...'
+                echo 'Push docker image to JFrog...'
                 bat '''
-                docker push %IMAGE_NAME%:%IMAGE_TAG% 
-                docker push %IMAGE_NAME%:latest
+                docker push %JFROG_IMAGE_NAME%:%IMAGE_TAG%
+                docker push %JFROG_IMAGE_NAME%:latest
                 '''
-
             }
         }
 
@@ -88,7 +108,7 @@ pipeline {
                 }
             }
             steps {
-                echo "Deploying image ${IMAGE_NAME}:${IMAGE_TAG} to Dev env..."
+                echo "Deploying image ${JFROG_IMAGE_NAME}:${IMAGE_TAG} to Dev env..."
             }
         }
 

@@ -34,6 +34,16 @@
     </pluginRepository>
 </pluginRepositories>
 
+<distributionManagement>
+    <repository>
+        <id>central</id> <!-- This MUST match the <id> in settings.xml -->
+        <url>https://trialsh57yr.jfrog.io/artifactory/sample-maven-release</url>
+    </repository>
+    <snapshotRepository>
+        <id>snapshots</id> <!-- This MUST match the <id> in settings.xml -->
+        <url>https://trialsh57yr.jfrog.io/artifactory/sample-maven-snapshot</url>
+    </snapshotRepository>
+</distributionManagement>
 
   <properties>
     <!-- Generic properties -->
