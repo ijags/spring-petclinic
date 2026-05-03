@@ -5,7 +5,7 @@ pipeline {
         APP_NAME = 'spring-petclinic'
         IMAGE_TAG = "4.0.0-SNAPSHOT-${BUILD_NUMBER}"
         IMAGE_NAME = "jagsonline/spring-petclinic"
-        DOCKER_REPO  = 'docker-local'
+        DOCKER_REPO  = 'sample-docker-local'
         
         JFROG_HOST = 'trialsh57yr.jfrog.io'
         JFROG_URL = "https://${JFROG_HOST}"
@@ -52,7 +52,13 @@ pipeline {
                     bat '''
                     jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false --overwrite=true
                     
-                    jf mvn-config --server-id-resolve=jfrog-server --server-id-deploy=jfrog-server --repo-deploy-releases=sample-maven-release --repo-deploy-snapshots=sample-maven-snapshot
+                    jf mvn-config ^
+                        --server-id-resolve=jfrog-server ^
+                        --server-id-deploy=jfrog-server ^
+                        --repo-resolve-releases=sample-maven-release ^
+                        --repo-resolve-snapshots=sample-maven-snapshot ^
+                        --repo-deploy-releases=sample-maven-release ^
+                        --repo-deploy-snapshots=sample-maven-snapshot
                     '''
                 }
             }
