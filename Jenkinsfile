@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
-        stage('Configure JFrog CLI') {
+        stage('Configure JFrog CLI & Maven') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'jfrog-creds',
@@ -51,6 +51,8 @@ pipeline {
                 )]) {
                     bat '''
                     jf config add jfrog-server --url=%JFROG_URL% --user=%JFROG_USER% --password=%JFROG_TOKEN% --interactive=false --overwrite=true
+                    
+                    jf mvn-config --server-id-deploy=jfrog-server --repo-deploy-releases=sample-maven-release --repo-deploy-snapshots=sample-maven-snapshot
                     '''
                 }
             }
