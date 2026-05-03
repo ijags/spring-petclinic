@@ -90,9 +90,7 @@ pipeline {
                     usernameVariable: 'JFROG_USER',
                     passwordVariable: 'JFROG_TOKEN'
                 )]) {
-                    powershell '''
-                    $env:JFROG_TOKEN | docker login $env:JFROG_HOST -u $env:JFROG_USER --password-stdin
-                    '''
+                    bat 'docker login %JFROG_HOST% -u %JFROG_USER% -p %JFROG_TOKEN%'
                 }
             }
         }
