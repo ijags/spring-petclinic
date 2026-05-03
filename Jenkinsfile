@@ -9,7 +9,7 @@ pipeline {
         
         JFROG_HOST = 'trialsh57yr.jfrog.io'
         JFROG_URL = "https://${JFROG_HOST}"
-        JFROG_DOCKER_REPO = 'docker-local'
+        JFROG_DOCKER_REPO = 'sample-docker-local'
         JFROG_IMAGE_NAME = "${JFROG_HOST}/${JFROG_DOCKER_REPO}/${APP_NAME}"
     }
 
