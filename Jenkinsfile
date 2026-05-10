@@ -76,7 +76,16 @@ pipeline {
             steps {
                 echo 'Building docker image...'
                 bat '''
-                docker build -t %JFROG_IMAGE_NAME%:%IMAGE_TAG% .
+                set GIT_SHORT=%GIT_COMMIT:~0,7%
+
+                docker build ^
+                --label app.name=%APP_NAME% ^
+                --label git.commit=%GIT_COMMIT% ^
+                --label git.commit.short=%GIT_SHORT% ^
+                --label jenkins.build.number=%BUILD_NUMBER% ^
+                --label jenkins.build.url=%BUILD_URL% ^
+                --label image.tag=%IMAGE_TAG% ^
+                -t %JFROG_IMAGE_NAME%:%IMAGE_TAG% .
                 docker tag %JFROG_IMAGE_NAME%:%IMAGE_TAG% %JFROG_IMAGE_NAME%:latest
                 '''
             }
